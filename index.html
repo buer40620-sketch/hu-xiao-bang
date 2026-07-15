@@ -1,0 +1,716 @@
+﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>护小帮</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-warm-50 text-warm-800 min-h-screen">
+
+    <div id="app">
+        <div id="page-home" class="page active">
+            <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 p-4 pb-28">
+                <div class="max-w-md mx-auto">
+                    <div class="text-center py-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white text-2xl">👨‍⚕️</span>
+                        </div>
+                        <h1 class="text-xl font-bold text-warm-800 mb-2">护小帮</h1>
+                        <p class="text-warm-500 text-sm">第一次照顾住院父母，AI陪你学会怎么做</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h2 class="text-base font-semibold text-gray-700 mb-3">请选择当前场景</h2>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="selectScenario('post-op-night')" class="scenario-btn bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-4 text-left hover:shadow-md transition-all" data-scenario="post-op-night">
+                                <div class="text-2xl mb-2">🌙</div>
+                                <div class="font-semibold text-warm-800 text-sm">住院第1晚</div>
+                                <div class="text-xs text-warm-500 mt-1">术后陪护</div>
+                            </button>
+                            <button onclick="selectScenario('home-recovery')" class="scenario-btn bg-gradient-to-br from-green-50 to-teal-50 border-2 border-green-200 rounded-2xl p-4 text-left hover:shadow-md transition-all" data-scenario="home-recovery">
+                                <div class="text-2xl mb-2">🏠</div>
+                                <div class="font-semibold text-warm-800 text-sm">出院回家</div>
+                                <div class="text-xs text-warm-500 mt-1">康复照护</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-4 card-shadow">
+                        <h3 class="font-semibold text-gray-700 mb-3">快捷入口</h3>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="goToPage('roadmap')" class="flex flex-col items-center p-3 rounded-xl hover:bg-warm-50 transition-all btn-press">
+                                <span class="material-icons text-primary">route</span>
+                                <span class="text-xs text-warm-600 mt-1">路线图</span>
+                            </button>
+                            <button onclick="goToPage('todo')" class="flex flex-col items-center p-3 rounded-xl hover:bg-warm-50 transition-all btn-press">
+                                <span class="material-icons text-green-500">check_circle</span>
+                                <span class="text-xs text-warm-600 mt-1">今日任务</span>
+                            </button>
+                            <button onclick="goToPage('training')" class="flex flex-col items-center p-3 rounded-xl hover:bg-warm-50 transition-all btn-press">
+                                <span class="material-icons text-purple-500">school</span>
+                                <span class="text-xs text-warm-600 mt-1">护理训练</span>
+                            </button>
+                            <button onclick="goToPage('support')" class="flex flex-col items-center p-3 rounded-xl hover:bg-warm-50 transition-all btn-press">
+                                <span class="material-icons text-secondary">battery_charging_full</span>
+                                <span class="text-xs text-warm-600 mt-1">我的续航</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="relative">
+                            <input type="text" id="search-input" placeholder="有什么问题？直接问我..." class="w-full bg-white rounded-xl py-3 px-4 pr-12 card-shadow text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" onkeydown="if(event.key==='Enter')searchCare()">
+                            <button onclick="searchCare()" class="absolute right-3 top-1/2 -translate-y-1/2">
+                                <span class="material-icons text-gray-400">send</span>
+                            </button>
+                        </div>
+                        <div id="search-results" class="mt-3 hidden"></div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="showEmergency()" class="fixed bottom-6 left-4 right-4 max-w-md mx-auto py-4 bg-red-500 text-white rounded-2xl font-bold btn-press shadow-lg flex items-center justify-center gap-3 risk-pulse">
+                <span class="material-icons text-2xl">emergency</span>
+                <span>紧急呼叫护士</span>
+            </button>
+        </div>
+
+
+        <div id="page-setup" class="page">
+            <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 p-4 pb-28">
+                <div class="max-w-md mx-auto">
+                    <div class="text-center py-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white text-2xl">🏥</span>
+                        </div>
+                        <h1 class="text-xl font-bold text-warm-800 mb-2">照护背景设置</h1>
+                        <p class="text-warm-500 text-sm">告诉我们一些基本信息，为您生成更贴心的建议</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-4 card-shadow mb-4">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <span>🔪</span> 手术类型
+                        </h3>
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <button onclick="console.log('orthopedic'); var btns=document.querySelectorAll('.surgery-btn'); btns.forEach(b=>{b.style.borderColor='#d1d5db'; b.style.backgroundColor='transparent'}); this.style.borderColor='#ef4444'; this.style.backgroundColor='rgba(239, 68, 68, 0.05)'; window.careBackground.surgeryType='orthopedic'" class="surgery-btn bg-warm-50 border-2 border-warm-200 rounded-xl p-3 text-left hover:border-primary transition-all" data-surgery="orthopedic">
+                                <div class="font-medium text-sm text-warm-800">骨科手术</div>
+                                <div class="text-xs text-warm-500">骨折、关节置换等</div>
+                            </button>
+                            <button onclick="console.log('abdominal'); var btns=document.querySelectorAll('.surgery-btn'); btns.forEach(b=>{b.style.borderColor='#d1d5db'; b.style.backgroundColor='transparent'}); this.style.borderColor='#ef4444'; this.style.backgroundColor='rgba(239, 68, 68, 0.05)'; window.careBackground.surgeryType='abdominal'" class="surgery-btn bg-warm-50 border-2 border-warm-200 rounded-xl p-3 text-left hover:border-primary transition-all" data-surgery="abdominal">
+                                <div class="font-medium text-sm text-warm-800">腹部手术</div>
+                                <div class="text-xs text-warm-500">肠胃、肝胆等</div>
+                            </button>
+                            <button onclick="console.log('cardiac'); var btns=document.querySelectorAll('.surgery-btn'); btns.forEach(b=>{b.style.borderColor='#d1d5db'; b.style.backgroundColor='transparent'}); this.style.borderColor='#ef4444'; this.style.backgroundColor='rgba(239, 68, 68, 0.05)'; window.careBackground.surgeryType='cardiac'" class="surgery-btn bg-warm-50 border-2 border-warm-200 rounded-xl p-3 text-left hover:border-primary transition-all" data-surgery="cardiac">
+                                <div class="font-medium text-sm text-warm-800">心脏手术</div>
+                                <div class="text-xs text-warm-500">搭桥、支架等</div>
+                            </button>
+                            <button onclick="console.log('brain'); var btns=document.querySelectorAll('.surgery-btn'); btns.forEach(b=>{b.style.borderColor='#d1d5db'; b.style.backgroundColor='transparent'}); this.style.borderColor='#ef4444'; this.style.backgroundColor='rgba(239, 68, 68, 0.05)'; window.careBackground.surgeryType='brain'" class="surgery-btn bg-warm-50 border-2 border-warm-200 rounded-xl p-3 text-left hover:border-primary transition-all" data-surgery="brain">
+                                <div class="font-medium text-sm text-warm-800">脑部手术</div>
+                                <div class="text-xs text-warm-500">肿瘤、神经等</div>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <input type="text" id="custom-surgery" placeholder="其他手术类型..." class="w-full bg-warm-50 rounded-xl p-3 text-sm border-2 border-warm-200 focus:border-primary focus:outline-none">
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-4 card-shadow mb-4">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <span>📅</span> 术后天数
+                        </h3>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="selectDays(1)" class="days-btn bg-primary text-white rounded-xl py-3 text-sm font-medium" data-days="1">第1天</button>
+                            <button onclick="selectDays(2)" class="days-btn bg-warm-50 border-2 border-warm-200 rounded-xl py-3 text-sm text-warm-800 hover:border-primary transition-all" data-days="2">第2-3天</button>
+                            <button onclick="selectDays(4)" class="days-btn bg-warm-50 border-2 border-warm-200 rounded-xl py-3 text-sm text-warm-800 hover:border-primary transition-all" data-days="4">第4-7天</button>
+                            <button onclick="selectDays('custom')" class="days-btn bg-warm-50 border-2 border-warm-200 rounded-xl py-3 text-sm text-warm-800 hover:border-primary transition-all" data-days="custom">自定义</button>
+                        </div>
+                        <div id="custom-days-input" class="mt-3 hidden">
+                            <input type="number" id="custom-days-value" placeholder="请输入术后天数" class="w-full bg-warm-50 rounded-xl p-3 text-sm border-2 border-warm-200 focus:border-primary focus:outline-none">
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-50 rounded-xl p-3 mb-6">
+                        <div class="flex items-start gap-2">
+                            <span class="text-amber-500 text-lg">⚠️</span>
+                            <p class="text-xs text-amber-700">以上信息用于生成参考建议，不替代医嘱。如有医疗疑问，请及时咨询医生。</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="saveCareBackground()" class="w-full bg-primary text-white rounded-xl py-3 font-semibold btn-press bg-primary-hover">
+                        确认并开始
+                    </button>
+                    
+                    <button onclick="skipSetup()" class="w-full mt-3 text-warm-500 text-sm">
+                        跳过，使用默认设置
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="page-roadmap" class="page">
+            <div class="min-h-screen bg-warm-50 p-4 pb-28">
+                <div class="max-w-md mx-auto">
+                    <button onclick="goBack()" class="text-primary flex items-center gap-1 mb-4">
+                        <span class="material-icons text-sm">arrow_back</span>
+                        <span class="text-sm">返回首页</span>
+                    </button>
+                    
+                    <div class="mb-4">
+                        <div class="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-medium mb-2">
+                            <span>🌙</span>
+                            <span>住院第1晚 · 术后陪护</span>
+                        </div>
+                        <h1 class="text-xl font-bold text-warm-800">今晚照护路线图</h1>
+                        <p class="text-warm-500 text-sm mt-1">妈妈刚做完手术，这是最关键的24小时</p>
+                    </div>
+
+                    <div id="roadmap-content">
+                        <!-- 动态内容将通过JavaScript插入 -->
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="goToPage('todo')" class="bg-primary text-white rounded-xl py-3 font-semibold flex items-center justify-center gap-2 btn-press bg-primary-hover">
+                            <span class="material-icons text-sm">check_circle</span>
+                            <span>今晚Todo</span>
+                        </button>
+                        <button onclick="goToPage('training')" class="bg-white border-2 border-gray-200 text-gray-700 rounded-xl py-3 font-semibold flex items-center justify-center gap-2 btn-press">
+                            <span class="material-icons text-sm">school</span>
+                            <span>护理训练</span>
+                        </button>
+                        <button id="btn-check" onclick="goToPage('check')" class="bg-white border-2 border-gray-200 text-gray-700 rounded-xl py-3 font-semibold flex items-center justify-center gap-2 btn-press">
+                            <span class="material-icons text-sm">description</span>
+                            <span>查房交班</span>
+                        </button>
+                        <button onclick="goToPage('support')" class="bg-gradient-to-r from-orange-400 to-yellow-400 text-white rounded-xl py-3 font-semibold flex items-center justify-center gap-2 btn-press">
+                            <span class="material-icons text-sm">bolt</span>
+                            <span>照护者续航</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button id="emergency-btn" onclick="showEmergency()" class="fixed bottom-6 left-4 right-4 max-w-md mx-auto py-4 bg-red-500 text-white rounded-2xl font-bold btn-press shadow-lg flex items-center justify-center gap-3 risk-pulse">
+                <span class="material-icons text-2xl">emergency</span>
+                <span>紧急呼叫护士</span>
+            </button>
+        </div>
+
+        <div id="page-todo" class="page">
+            <div class="min-h-screen bg-warm-50 p-4 pb-28">
+                <div class="max-w-md mx-auto">
+                    <div class="flex items-center justify-between mb-4">
+                        <button onclick="goBack()" class="text-primary flex items-center gap-1">
+                            <span class="material-icons text-sm">arrow_back</span>
+                            <span class="text-sm">返回路线图</span>
+                        </button>
+                        <button onclick="toggleNightMode()" id="night-mode-btn" class="bg-gray-100 rounded-full p-2 hover:bg-gray-200 transition-all btn-press">
+                            <span class="material-icons text-warm-600 text-sm">nightlight</span>
+                        </button>
+                    </div>
+                    
+                    <div id="todo-header" class="mb-4">
+                        <h1 class="text-xl font-bold text-warm-800">今日照护清单</h1>
+                        <p id="todo-subtitle" class="text-warm-500 text-sm mt-1">🌙 住院第1晚 · 2026年6月26日</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-4 card-shadow mb-4">
+                        <div class="flex items-center justify-between text-xs text-warm-500 mb-2">
+                            <span>完成进度</span>
+                            <span id="todo-progress-text">0/5</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2">
+                            <div id="todo-progress-bar" class="bg-primary h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-accent to-orange-50 rounded-2xl p-3 border border-primary/20 mb-4">
+                        <h3 class="font-semibold text-gray-700 text-sm mb-2">快速记录</h3>
+                        <div class="flex gap-2">
+                            <button onclick="quickRecord('pain')" class="flex-1 bg-white rounded-lg py-2 text-sm text-warm-600 flex items-center justify-center gap-1 btn-press">
+                                <span>😣</span> 疼痛
+                            </button>
+                            <button onclick="quickRecord('urine')" class="flex-1 bg-white rounded-lg py-2 text-sm text-warm-600 flex items-center justify-center gap-1 btn-press">
+                                <span>💧</span> 排尿
+                            </button>
+                            <button onclick="quickRecord('temp')" class="flex-1 bg-white rounded-lg py-2 text-sm text-warm-600 flex items-center justify-center gap-1 btn-press">
+                                <span>🌡️</span> 体温
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="records-display" class="bg-white rounded-2xl p-4 card-shadow mb-4 hidden">
+                        <h3 class="font-semibold text-gray-700 text-sm mb-3">今日记录</h3>
+                        <div id="records-list" class="space-y-2">
+                        </div>
+                    </div>
+                    
+                    <div id="todo-list" class="space-y-3">
+                    </div>
+                </div>
+            </div>
+            <button onclick="showEmergency()" class="fixed bottom-6 left-4 right-4 max-w-md mx-auto py-4 bg-red-500 text-white rounded-2xl font-bold btn-press shadow-lg flex items-center justify-center gap-3 risk-pulse">
+                <span class="material-icons text-2xl">emergency</span>
+                <span>紧急呼叫护士</span>
+            </button>
+        </div>
+
+        <div id="page-share" class="page">
+            <div class="min-h-screen bg-warm-50 p-4 pb-28">
+                <div class="max-w-md mx-auto">
+                    <button onclick="goBack()" class="text-primary flex items-center gap-1 mb-4">
+                        <span class="material-icons text-sm">arrow_back</span>
+                        <span class="text-sm">返回路线图</span>
+                    </button>
+                    
+                    <div class="mb-4">
+                        <h1 class="text-xl font-bold text-warm-800">换班同步</h1>
+                        <p class="text-warm-500 text-sm mt-1">让家人清晰了解当前照护进度</p>
+                    </div>
+                    
+                    <div id="share-content" class="space-y-4">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-training" class="page">
+            <div class="min-h-screen bg-warm-50 p-4 pb-28">
+                <div class="max-w-md mx-auto">
+                    <button onclick="goBack()" class="text-primary flex items-center gap-1 mb-4">
+                        <span class="material-icons text-sm">arrow_back</span>
+                        <span class="text-sm">返回路线图</span>
+                    </button>
+                    
+                    <div class="mb-4">
+                        <h1 class="text-xl font-bold text-warm-800">护理训练</h1>
+                        <p class="text-warm-500 text-sm mt-1">跟着视频学，马上就会</p>
+                    </div>
+                    
+                    <div onclick="showMicroTraining()" class="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl p-4 card-shadow cursor-pointer hover:shadow-lg transition-all mb-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <span class="text-3xl">🎮</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-white">互动微训练</h3>
+                                <p class="text-white/80 text-sm mt-1">做道题测试一下，看看自己掌握了多少</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full">8道题</span>
+                                    <span class="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full">约5分钟</span>
+                                </div>
+                            </div>
+                            <span class="material-icons text-white">play_circle</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <!-- 今晚必学科目进度徽章 -->
+                        <div id="training-badge" class="hidden bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl px-4 py-2 text-sm font-medium text-center mb-2">
+                            今晚必学科目：0/4 完成
+                        </div>
+                        
+                        <div onclick="showTrainingDetail('turn-body')" data-training="turn-body" class="bg-white rounded-2xl p-4 card-shadow cursor-pointer hover:shadow-md transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <span class="text-2xl">🔄</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-warm-800">术后翻身</h3>
+                                    <p class="text-warm-500 text-sm mt-1">预防压疮，必学技能</p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-xs text-gray-400">📹 2分钟</span>
+                                        <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">今晚必学</span>
+                                    </div>
+                                </div>
+                                <span class="material-icons text-gray-400">chevron_right</span>
+                            </div>
+                        </div>
+                        
+                        <div onclick="showTrainingDetail('pressure')" data-training="pressure" class="bg-white rounded-2xl p-4 card-shadow cursor-pointer hover:shadow-md transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <span class="text-2xl">🛡️</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-warm-800">压疮预防护理</h3>
+                                    <p class="text-warm-500 text-sm mt-1">预防压疮，保护皮肤健康</p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-xs text-gray-400">📹 1.5分钟</span>
+                                        <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">常规任务</span>
+                                    </div>
+                                </div>
+                                <span class="material-icons text-gray-400">chevron_right</span>
+                            </div>
+                        </div>
+                        
+                        <div onclick="showTrainingDetail('drainage')" data-training="drainage" class="bg-white rounded-2xl p-4 card-shadow cursor-pointer hover:shadow-md transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <span class="text-2xl">💧</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-warm-800">引流管护理观察</h3>
+                                    <p class="text-warm-500 text-sm mt-1">学会观察和保护引流管</p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-xs text-gray-400">📹 2分钟</span>
+                                        <span class="text-xs bg-cyan-100 text-cyan-600 px-2 py-0.5 rounded-full">安全必学</span>
+                                    </div>
+                                </div>
+                                <span class="material-icons text-gray-400">chevron_right</span>
+                            </div>
+                        </div>
+                        
+                        <div onclick="showTrainingDetail('pain')" data-training="pain" class="bg-white rounded-2xl p-4 card-shadow cursor-pointer hover:shadow-md transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <span class="text-2xl">😣</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-warm-800">术后疼痛评估与护理干预</h3>
+                                    <p class="text-warm-500 text-sm mt-1">学会评估疼痛并正确处理</p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-xs text-gray-400">📹 2分钟</span>
+                                        <span class="text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">安全必学</span>
+                                    </div>
+                                </div>
+                                <span class="material-icons text-gray-400">chevron_right</span>
+                            </div>
+                        </div>
+                        
+                        <div onclick="showTrainingDetail('ambulation')" data-training="ambulation" class="bg-white rounded-2xl p-4 card-shadow cursor-pointer hover:shadow-md transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-teal-100 to-teal-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <span class="text-2xl">🚶</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-warm-800">术后早期下床活动指引</h3>
+                                    <p class="text-warm-500 text-sm mt-1">安全协助患者术后第一次下床</p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-xs text-gray-400">📹 2分钟</span>
+                                        <span class="text-xs bg-teal-100 text-teal-600 px-2 py-0.5 rounded-full">康复护理</span>
+                                    </div>
+                                </div>
+                                <span class="material-icons text-gray-400">chevron_right</span>
+                            </div>
+                        </div>
+                        
+                        <div onclick="showTrainingDetail('wound-dressing')" data-training="wound-dressing" class="bg-white rounded-2xl p-4 card-shadow cursor-pointer hover:shadow-md transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-rose-100 to-rose-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <span class="text-2xl">🩹</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-warm-800">伤口换药护理</h3>
+                                    <p class="text-warm-500 text-sm mt-1">安全更换伤口外层敷料</p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-xs text-gray-400">📹 2分钟</span>
+                                        <span class="text-xs bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">基础护理</span>
+                                    </div>
+                                </div>
+                                <span class="material-icons text-gray-400">chevron_right</span>
+                            </div>
+                        </div>
+                        
+                        <div onclick="showTrainingDetail('bath')" data-training="bath" class="bg-white rounded-2xl p-4 card-shadow cursor-pointer hover:shadow-md transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <span class="text-2xl">🛁</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-warm-800">床上擦浴</h3>
+                                    <p class="text-warm-500 text-sm mt-1">保持身体清洁舒适</p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-xs text-gray-400">📹 2分钟</span>
+                                        <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">基础护理</span>
+                                    </div>
+                                </div>
+                                <span class="material-icons text-gray-400">chevron_right</span>
+                            </div>
+                        </div>
+                        
+                        <div onclick="showTrainingDetail('oxygen')" data-training="oxygen" class="bg-white rounded-2xl p-4 card-shadow cursor-pointer hover:shadow-md transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-teal-100 to-teal-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <span class="text-2xl">💨</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-warm-800">吸氧护理</h3>
+                                    <p class="text-warm-500 text-sm mt-1">正确使用吸氧设备</p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-xs text-gray-400">📹 2分钟</span>
+                                        <span class="text-xs bg-teal-100 text-teal-600 px-2 py-0.5 rounded-full">急救护理</span>
+                                    </div>
+                                </div>
+                                <span class="material-icons text-gray-400">chevron_right</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="showEmergency()" class="fixed bottom-6 left-4 right-4 max-w-md mx-auto py-4 bg-red-500 text-white rounded-2xl font-bold btn-press shadow-lg flex items-center justify-center gap-3 risk-pulse">
+                <span class="material-icons text-2xl">emergency</span>
+                <span>紧急呼叫护士</span>
+            </button>
+        </div>
+
+        <div id="page-check" class="page">
+            <div class="min-h-screen bg-warm-50 p-4 pb-28">
+                <div class="max-w-md mx-auto">
+                    <button onclick="goBack()" class="text-primary flex items-center gap-1 mb-4">
+                        <span class="material-icons text-sm">arrow_back</span>
+                        <span class="text-sm">返回路线图</span>
+                    </button>
+                    
+                    <div id="check-header">
+                        <h1 class="text-xl font-bold text-warm-800">查房交班</h1>
+                        <p class="text-warm-500 text-sm mt-1">帮医生护士快速了解情况</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 card-shadow mb-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-semibold text-warm-800">照护资料包</h3>
+                            <button onclick="editCarePackage()" class="text-xs text-primary flex items-center gap-1">
+                                <span class="material-icons text-sm">edit</span>
+                                编辑
+                            </button>
+                        </div>
+                        
+                        <div id="care-package-content" class="space-y-3 text-sm">
+                            <div class="flex items-start gap-3">
+                                <span class="text-gray-400 w-16 flex-shrink-0">患者</span>
+                                <span id="cp-patient" class="text-warm-800">王XX，女，65岁</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-gray-400 w-16 flex-shrink-0">诊断</span>
+                                <span id="cp-diagnosis" class="text-warm-800">腹腔镜胆囊切除术后第1天</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-gray-400 w-16 flex-shrink-0">过敏史</span>
+                                <span id="cp-allergy" class="text-warm-800">无药物过敏</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-gray-400 w-16 flex-shrink-0">长期用药</span>
+                                <span id="cp-medications" class="text-warm-800">无</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-gray-400 w-16 flex-shrink-0">既往病史</span>
+                                <span id="cp-history" class="text-warm-800">无</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="check-content">
+                        <!-- 动态内容将通过JavaScript插入 -->
+                    </div>
+                </div>
+            </div>
+            <button onclick="showEmergency()" class="fixed bottom-6 left-4 right-4 max-w-md mx-auto py-4 bg-red-500 text-white rounded-2xl font-bold btn-press shadow-lg flex items-center justify-center gap-3 risk-pulse">
+                <span class="material-icons text-2xl">emergency</span>
+                <span>紧急呼叫护士</span>
+            </button>
+        </div>
+
+        <div id="page-support" class="page">
+            <div class="min-h-screen bg-gradient-to-b from-orange-50 to-gray-50 p-4 pb-28">
+                <div class="max-w-md mx-auto">
+                    <button onclick="goBack()" class="text-primary flex items-center gap-1 mb-4">
+                        <span class="material-icons text-sm">arrow_back</span>
+                        <span class="text-sm">返回路线图</span>
+                    </button>
+                    
+                    <div class="mb-4">
+                        <h1 class="text-xl font-bold text-warm-800">照护者续航</h1>
+                        <p class="text-warm-500 text-sm mt-1">你也要照顾好自己</p>
+                    </div>
+
+                    <div id="support-content" class="space-y-4"></div>
+                    
+                    <div class="bg-white rounded-2xl p-4 card-shadow mb-4">
+                        <h3 class="font-semibold text-warm-800 mb-3">今晚状态自检</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xl">😴</span>
+                                    <span class="text-gray-700 text-sm">睡眠时间</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-warm-500 text-sm">3小时</span>
+                                    <span class="material-icons text-orange-500 text-sm">warning</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xl">💧</span>
+                                    <span class="text-gray-700 text-sm">饮水量</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-warm-500 text-sm">不足</span>
+                                    <span class="material-icons text-red-500 text-sm">error</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xl">🍞</span>
+                                    <span class="text-gray-700 text-sm">进食情况</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-warm-500 text-sm">晚餐未吃</span>
+                                    <span class="material-icons text-red-500 text-sm">error</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xl">😰</span>
+                                    <span class="text-gray-700 text-sm">焦虑程度</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-warm-500 text-sm">中等</span>
+                                    <span class="material-icons text-orange-500 text-sm">warning</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl p-4 border border-orange-100 mb-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-orange-500 text-xl">📊</span>
+                            <h3 class="font-bold text-warm-800">今晚你可能会遇到</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-white/60 rounded-xl p-3">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-lg">😴</span>
+                                    <span class="font-semibold text-gray-700 text-sm">睡眠挑战</span>
+                                </div>
+                                <ul class="text-xs text-warm-500 space-y-1">
+                                    <li>• 每2小时翻身会打断睡眠</li>
+                                    <li>• 凌晨2点换液可能被叫醒</li>
+                                    <li>• 陪护床不舒服，很难入睡</li>
+                                </ul>
+                                <div class="mt-2 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-lg">
+                                    💡 应对：趁妈妈睡着时闭眼打盹20分钟（定闹钟）
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white/60 rounded-xl p-3">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-lg">💪</span>
+                                    <span class="font-semibold text-gray-700 text-sm">体力挑战</span>
+                                </div>
+                                <ul class="text-xs text-warm-500 space-y-1">
+                                    <li>• 翻身、扶抱会消耗大量体力</li>
+                                    <li>• 喝水、吃饭可能不规律</li>
+                                    <li>• 精神高度紧张会加重疲劳</li>
+                                </ul>
+                                <div class="mt-2 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-lg">
+                                    💡 应对：准备好能量棒和水，随时补充
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white/60 rounded-xl p-3">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-lg">😔</span>
+                                    <span class="font-semibold text-gray-700 text-sm">情绪挑战</span>
+                                </div>
+                                <ul class="text-xs text-warm-500 space-y-1">
+                                    <li>• 心疼妈妈疼痛，产生内疚感</li>
+                                    <li>• 怕做错，精神高度紧张</li>
+                                    <li>• 可能会感到烦躁、焦虑</li>
+                                </ul>
+                                <div class="mt-2 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-lg">
+                                    💡 应对：深呼吸（4秒吸，6秒呼），告诉自己"你不是一个人"
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-t border-orange-200">
+                            <div class="flex items-center gap-2">
+                                <span class="text-red-500">🚨</span>
+                                <span class="text-xs text-warm-600 font-medium">求助信号</span>
+                            </div>
+                            <p class="text-xs text-warm-500 mt-1">如果出现以下情况，请立即求助：<br>• 突发异常出血 • 呼吸困难 • 意识模糊</p>
+                        </div>
+                    </div>
+
+                    <div id="support-content" class="space-y-4">
+                    </div>
+                    
+                    <button onclick="resetAllData()" class="w-full bg-gray-100 text-gray-500 rounded-xl py-2 text-xs font-medium mt-6">
+                        重置所有数据
+                    </button>
+                </div>
+            </div>
+            <button onclick="showEmergency()" class="fixed bottom-6 left-4 right-4 max-w-md mx-auto py-4 bg-red-500 text-white rounded-2xl font-bold btn-press shadow-lg flex items-center justify-center gap-3 risk-pulse">
+                <span class="material-icons text-2xl">emergency</span>
+                <span>紧急呼叫护士</span>
+            </button>
+        </div>
+
+        <div id="modal-training-detail" class="fixed inset-0 bg-black/50 flex items-end justify-center z-50 hidden md:items-center">
+            <div class="bg-white w-full md:w-[430px] md:rounded-3xl rounded-t-3xl p-4 slide-up max-h-[85vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 id="training-title" class="text-lg font-bold text-warm-800">护理训练详情</h2>
+                    <button onclick="closeTrainingDetail()" class="p-3 min-w-[48px] min-h-[48px] flex items-center justify-center hover:bg-gray-100 rounded-full">
+                        <span class="material-icons text-warm-500">close</span>
+                    </button>
+                </div>
+                <div id="training-content" class="space-y-4 pb-4">
+                </div>
+            </div>
+        </div>
+
+        <!-- 微训练模态框 -->
+        <div id="modal-micro-training" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white w-full max-w-md mx-4 rounded-2xl overflow-hidden slide-up max-h-[90vh] flex flex-col">
+                <div id="training-header" class="bg-gradient-to-r from-purple-500 to-indigo-500 p-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-bold text-white">🎮 互动微训练</h2>
+                        <button onclick="closeMicroTraining()" class="p-2 hover:bg-white/20 rounded-full">
+                            <span class="material-icons text-white">close</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-3 mt-2">
+                        <span id="training-progress" class="text-white/80 text-sm">第 1 题 / 共 4 题</span>
+                        <div class="flex-1 bg-white/20 rounded-full h-2">
+                            <div id="training-progress-bar" class="bg-white h-2 rounded-full transition-all" style="width: 25%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="training-content" class="flex-1 overflow-y-auto p-4">
+                    <!-- 题目内容动态加载 -->
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-record" class="fixed inset-0 bg-black/50 flex items-end z-50 hidden">
+            <div class="bg-white w-full rounded-t-3xl p-4 slide-up">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 id="record-title" class="text-lg font-bold text-warm-800">快速记录</h2>
+                    <button onclick="closeRecord()" class="p-2 hover:bg-gray-100 rounded-full">
+                        <span class="material-icons text-warm-500">close</span>
+                    </button>
+                </div>
+                <div id="record-content" class="space-y-4">
+                    <div class="bg-warm-50 rounded-xl p-4">
+                        <label id="record-label" class="block text-sm font-medium text-gray-700 mb-2">疼痛评分 (0-10)</label>
+                        <input type="number" id="record-value" step="0.1" class="w-full bg-white rounded-lg p-3 text-lg font-bold text-primary focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
+                    <div class="bg-warm-50 rounded-xl p-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">备注</label>
+                        <textarea id="record-note" class="w-full bg-white rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" rows="3" placeholder="输入备注信息..."></textarea>
+                    </div>
+                    <button onclick="saveRecord()" class="w-full bg-primary text-white rounded-xl py-3 font-semibold btn-press bg-primary-hover">保存记录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="training-fix.js"></script>
+
+    
+</body>
+</html>
